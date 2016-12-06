@@ -7,8 +7,8 @@
     "type": "git",
     "url": "https://github.com/jgaull/bike-pretty.git"
   },
-  "homepage": "http://www.bikepretty.com/",
-  "author": "Jonathan Gaull <jon@bikepretty.com>",
+  "homepage": "http://www.modeo.co/",
+  "author": "Jonathan Gaull <jon@modeo.co>",
   "dependencies": {
   },
   "devDependencies": {
