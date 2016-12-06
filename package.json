@@ -1,0 +1,24 @@
+{
+  "name": "path-proxy",
+  "version": "0.0.1",
+  "description": "Generate paths using javascript objects. Use path-proxy as a wrapper for your favorite storage solution.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jgaull/bike-pretty.git"
+  },
+  "homepage": "http://www.bikepretty.com/",
+  "author": "Jonathan Gaull <jon@bikepretty.com>",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "should": "^11.1.1"
+  },
+  "main": "path-proxy.js",
+  "engines": {
+    "node": ">= 6.0.0"
+  },
+  "scripts": {
+    "test": "node test.js"
+  }
+}
