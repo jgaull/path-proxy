@@ -2,15 +2,25 @@
 var should = require('should')
 
 var PathProxy = require('./path-proxy')
-var root = new PathProxy()
+var rootPath = new PathProxy()
 
 //PathProxy always returns an object
-should.exist(root.a.deeply.nested.property)
+should.exist(rootPath.a.deeply.nested.property)
+
 //Call toPath on any PathProxy and get a string representation of the path
-should(root.a.deeply.nested.property.toPath()).be.equal('a.deeply.nested.property')
+should(rootPath.a.deeply.nested.property.toPath()).be.equal('a.deeply.nested.property')
+
+//Use path proxy to generate URLs
+url = new PathProxy({
+	concatentationString: "/",
+	prefix: "http://modeo.co/",
+	suffix: ".html"
+})
+
+should(url.blog.post.toPath()).be.equal("http://modeo.co/blog/post.html")
 
 //You can also use your own toPath and getValue functions
-root = new PathProxy({
+var customPath = new PathProxy({
 	//use a custom toPath() function
 	toPath: function () {
 		var keys = this.keys
@@ -36,10 +46,12 @@ root = new PathProxy({
 })
 
 //This will use your custom toPath() function
-should(root.a.property.toPath()).be.equal('a,property')
+should(customPath.a.property.toPath()).be.equal('a,property')
 //This will return the custom getValue() result for the key testProperty
-should(root.a.property.testProperty).be.equal('this is a test')
+should(customPath.a.property.testProperty).be.equal('this is a test')
 //This will return the custom getValue() result for the key testFunction
-should(root.a.property.testFunction('arbitrary argument')).be.equal('The path is a,property. The argument is arbitrary argument')
+should(customPath.a.property.testFunction('arbitrary argument')).be.equal('The path is a,property. The argument is arbitrary argument')
 
 console.log("tests completed successfully!")
+
+

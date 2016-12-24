@@ -13,6 +13,22 @@ function PathProxy (base = {}, keys = []) {
 
 	//store this for use later
 	base.keys = keys
+
+	//prefix is added to the beginning of every path string (eg. http://)
+	if (!base.prefix || typeof base.prefix !== typeof 'string') {
+		base.prefix = ""
+	}
+
+	//suffix is added to the end of every path string (eg. .json)
+	if (!base.suffix || typeof base.suffix !== typeof 'string') {
+		base.suffix = ""
+	}
+
+	//concatenationString is added between each path key (eg. object.a.path)
+	if (!base.concatentationString || typeof base.concatentationString !== typeof 'string') {
+		base.concatentationString = "."
+	}
+
 	//does the base object have a toPath() function?
 	if (!base.toPath) {
 		//If it doesn't then use the default
@@ -22,10 +38,10 @@ function PathProxy (base = {}, keys = []) {
 			var pathString = ''
 			//build up a string representation of the path
 			for (var i = 0; i < keys.length; i++) {
-				pathString += keys[i] + '.'
+				pathString += keys[i] + this.concatentationString
 			}
 			//return the path minus the last '.'
-			return pathString.slice(0, -1)
+			return this.prefix + pathString.slice(0, -this.concatentationString.length) + this.suffix
 		}
 	}
 	//Does the base object have a getValue() function?
@@ -42,7 +58,7 @@ function PathProxy (base = {}, keys = []) {
 		//override the getter for the base object
 		get: function (obj, key) {
 			//Key must be a string
-			if (typeof key !== typeof 'a') {
+			if (typeof key !== typeof 'string') {
 				throw Error("key must be a string")
 			}
 
@@ -61,7 +77,7 @@ function PathProxy (base = {}, keys = []) {
 
 			if (value) {
 				//If value is a function
-				if (typeof value ==='function') {
+				if (typeof value === 'function') {
 					//Return a function that returns the value of the function (recursion, amirite?)
 					return function () {
 						args = [].slice.call(arguments) //create a copy of the arguments array
