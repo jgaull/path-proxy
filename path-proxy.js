@@ -1,7 +1,13 @@
 
 module.exports = PathProxy 
 
-function PathProxy (base = {}, keys = []) {
+function PathProxy(base = {}, root = null, keys = []) {
+
+	var thisBase = base
+	if (keys.length == 0 && root) {
+		thisBase = root
+	}
+
 	//check for non-string keys
 	for (var i = 0; i < keys.length; i++) {
 		var key = keys[i]
@@ -12,27 +18,27 @@ function PathProxy (base = {}, keys = []) {
 	}
 
 	//store this for use later
-	base.keys = keys
+	thisBase.keys = keys
 
 	//prefix is added to the beginning of every path string (eg. http://)
-	if (!base.prefix || typeof base.prefix !== typeof 'string') {
-		base.prefix = ""
+	if (!thisBase.prefix || typeof thisBase.prefix !== typeof 'string') {
+		thisBase.prefix = ""
 	}
 
 	//suffix is added to the end of every path string (eg. .json)
-	if (!base.suffix || typeof base.suffix !== typeof 'string') {
-		base.suffix = ""
+	if (!thisBase.suffix || typeof thisBase.suffix !== typeof 'string') {
+		thisBase.suffix = ""
 	}
 
 	//concatenationString is added between each path key (eg. object.a.path)
-	if (!base.concatentationString || typeof base.concatentationString !== typeof 'string') {
-		base.concatentationString = "."
+	if (!thisBase.concatentationString || typeof thisBase.concatentationString !== typeof 'string') {
+		thisBase.concatentationString = "."
 	}
 
 	//does the base object have a toPath() function?
-	if (!base.toPath) {
+	if (!thisBase.toPath) {
 		//If it doesn't then use the default
-		base.toPath = function () {
+		thisBase.toPath = function () {
 			//get the keys representing the path
 			var keys = this.keys
 			var pathString = ''
@@ -45,15 +51,15 @@ function PathProxy (base = {}, keys = []) {
 		}
 	}
 	//Does the base object have a getValue() function?
-	if (!base.getValue) {
+	if (!thisBase.getValue) {
 		//If it doesn't then use the default
-		base.getValue = function (obj, key) {
+		thisBase.getValue = function (obj, key) {
 			//Basic get value
 			return obj[key]
 		}
 	}
 
-	var proxy = new Proxy(base, 
+	var proxy = new Proxy(thisBase, 
 	{
 		//override the getter for the base object
 		get: function (obj, key) {
@@ -68,11 +74,11 @@ function PathProxy (base = {}, keys = []) {
 			//If the toPath() function is the target of the get
 			if (key === "toPath") {
 				//then value is toPath()
-				value = base.toPath
+				value = thisBase.toPath
 			}
 			else {
 				//If it's not then use the base objects getValue function
-				value = base.getValue(obj, key)
+				value = thisBase.getValue(obj, key)
 			}
 
 			if (value) {
@@ -83,7 +89,7 @@ function PathProxy (base = {}, keys = []) {
 						args = [].slice.call(arguments) //create a copy of the arguments array
 						args.unshift(obj.toPath()) //add the path to this object as the first argument
 						//console.log("args: " + JSON.stringify(args))
-						return value.apply(base, args) //call the function with the base object as the 'this' argument
+						return value.apply(thisBase, args) //call the function with the base object as the 'this' argument
 					}
 				}
 				else {
@@ -95,8 +101,7 @@ function PathProxy (base = {}, keys = []) {
 			var keysCopy = keys.slice(0) //copy the keys array
 			keysCopy.push(key) //add the current key to the current path
 
-			return new PathProxy(base, keysCopy) //return a PathProxy with the new path
-			
+			return new PathProxy(base, null, keysCopy) //return a PathProxy with the new path
 		}
 	})
 

@@ -20,7 +20,7 @@ url = new PathProxy({
 should(url.blog.post.toPath()).be.equal("http://modeo.co/blog/post.html")
 
 //You can also use your own toPath and getValue functions
-var customPath = new PathProxy({
+var base = {
 	//use a custom toPath() function
 	toPath: function () {
 		var keys = this.keys
@@ -42,8 +42,12 @@ var customPath = new PathProxy({
 		}
 
 		return obj[key]
-	}
-})
+	},
+
+	customProperty: 'a property'
+}
+
+var customPath = new PathProxy(base)
 
 //This will use your custom toPath() function
 should(customPath.a.property.toPath()).be.equal('a,property')
@@ -51,6 +55,26 @@ should(customPath.a.property.toPath()).be.equal('a,property')
 should(customPath.a.property.testProperty).be.equal('this is a test')
 //This will return the custom getValue() result for the key testFunction
 should(customPath.a.property.testFunction('arbitrary argument')).be.equal('The path is a,property. The argument is arbitrary argument')
+//This will return the value of a custom property
+should(customPath.customProperty).be.equal('a property')
+
+//You can make the root node a different class than all the other nodes
+var root = {
+	//use a custom toPath() function
+	toPath: function () {
+		return 'Enoch' //Read Cryptonomicon
+	},
+	customProperty: 'a property on the root'
+}
+var customRoot = new PathProxy(base, root)
+//The root object is always the root node
+should(customRoot.customProperty).be.equal('a property on the root')
+should(customRoot.toPath()).be.equal('Enoch')
+
+//And all deeper objects are the base object
+should(customRoot.a.property.toPath()).be.equal('a,property')
+should(customRoot.a.property.testProperty).be.equal('this is a test')
+should(customRoot.a.property.testFunction('an arbitrary argument')).be.equal('The path is a,property. The argument is an arbitrary argument')
 
 console.log("tests completed successfully!")
 
