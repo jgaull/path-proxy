@@ -101,7 +101,15 @@ function PathProxy(base = {}, root = null, keys = []) {
 			var keysCopy = keys.slice(0) //copy the keys array
 			keysCopy.push(key) //add the current key to the current path
 
-			return new PathProxy(base, null, keysCopy) //return a PathProxy with the new path
+			var newProxy
+			if (root && typeof root.getNode === 'function') {
+				newProxy = root.getNode(base, root, keysCopy)
+			}
+			else {
+				newProxy = new PathProxy(base, root, keysCopy)
+			}
+
+			return newProxy //return a PathProxy with the new path
 		}
 	})
 

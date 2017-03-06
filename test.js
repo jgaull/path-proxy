@@ -58,23 +58,44 @@ should(customPath.a.property.testFunction('arbitrary argument')).be.equal('The p
 //This will return the value of a custom property
 should(customPath.customProperty).be.equal('a property')
 
-//You can make the root node a different class than all the other nodes
+//Supply a custom root node
 var root = {
 	//use a custom toPath() function
 	toPath: function () {
 		return 'Enoch' //Read Cryptonomicon
 	},
+	getNode: function (base, root, keys) {
+
+		var base
+		var nodeType = keys[0]
+		if (nodeType == 'foo') {
+
+			base = {
+				toPath: function () {
+					return 'foo'
+				}
+			}
+		}
+		else if (nodeType == 'bar') {
+
+			base = {
+				toPath: function () {
+					return 'bar'
+				}
+			}
+		}
+
+		return new PathProxy(base, root, keys)
+	},
 	customProperty: 'a property on the root'
 }
+
 var customRoot = new PathProxy(base, root)
 //The root object is always the root node
-should(customRoot.customProperty).be.equal('a property on the root')
 should(customRoot.toPath()).be.equal('Enoch')
-
-//And all deeper objects are the base object
-should(customRoot.a.property.toPath()).be.equal('a,property')
-should(customRoot.a.property.testProperty).be.equal('this is a test')
-should(customRoot.a.property.testFunction('an arbitrary argument')).be.equal('The path is a,property. The argument is an arbitrary argument')
+//Define a getNode factory method to create nodes dynamically
+should(customRoot.foo.toPath()).be.equal('foo')
+should(customRoot.bar.toPath()).be.equal('bar')
 
 console.log("tests completed successfully!")
 
