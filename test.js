@@ -4,23 +4,28 @@ var should = require('should')
 var PathProxy = require('./path-proxy')
 var rootPath = new PathProxy()
 
+
 //PathProxy always returns an object
 should.exist(rootPath.a.deeply.nested.property)
 
 //Call toPath on any PathProxy and get a string representation of the path
 should(rootPath.a.deeply.nested.property.toPath()).be.equal('a.deeply.nested.property')
 
+
 //Use path proxy to generate URLs
 url = new PathProxy({
-	concatentationString: "/",
-	prefix: "http://modeo.co/",
-	suffix: ".html"
+	root: {
+		concatentationString: "/",
+		prefix: "http://modeo.co/",
+		suffix: ".html"
+	}
 })
 
+should(url.toPath()).be.equal('http://modeo.co/.html')
 should(url.blog.post.toPath()).be.equal("http://modeo.co/blog/post.html")
 
 //You can also use your own toPath and getValue functions
-var base = {
+var root = {
 	//use a custom toPath() function
 	toPath: function () {
 		var keys = this.keys
@@ -47,7 +52,7 @@ var base = {
 	customProperty: 'a property'
 }
 
-var customPath = new PathProxy(base)
+var customPath = new PathProxy( {root: root} )
 
 //This will use your custom toPath() function
 should(customPath.a.property.toPath()).be.equal('a,property')
@@ -59,12 +64,12 @@ should(customPath.a.property.testFunction('arbitrary argument')).be.equal('The p
 should(customPath.customProperty).be.equal('a property')
 
 //Supply a custom root node
-var root = {
+root = {
 	//use a custom toPath() function
 	toPath: function () {
 		return 'Enoch' //Read Cryptonomicon
 	},
-	getNode: function (base, root, keys) {
+	getNode: function (keys) {
 
 		var base
 		var nodeType = keys[0]
@@ -85,12 +90,12 @@ var root = {
 			}
 		}
 
-		return new PathProxy(base, root, keys)
+		return null //this always uses the root node
 	},
 	customProperty: 'a property on the root'
 }
 
-var customRoot = new PathProxy(base, root)
+var customRoot = new PathProxy( {root:root} )
 //The root object is always the root node
 should(customRoot.toPath()).be.equal('Enoch')
 //Define a getNode factory method to create nodes dynamically

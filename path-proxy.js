@@ -1,7 +1,23 @@
 
 module.exports = PathProxy 
 
-function PathProxy(base = {}, root = null, keys = []) {
+function PathProxy(params) {
+
+	if (!params) {
+		params = {}
+	}
+
+	var root = params.root
+	var base = params.base
+	var keys = params.keys
+
+	if (!base) {
+		base = {}
+	}
+
+	if (!keys) {
+		keys = []
+	}
 
 	var thisBase = base
 	if (keys.length == 0 && root) {
@@ -101,13 +117,16 @@ function PathProxy(base = {}, root = null, keys = []) {
 			var keysCopy = keys.slice(0) //copy the keys array
 			keysCopy.push(key) //add the current key to the current path
 
-			var newProxy
+			var baseObject = root
 			if (root && typeof root.getNode === 'function') {
-				newProxy = root.getNode(base, root, keysCopy)
+				baseObject = root.getNode(keysCopy)
 			}
-			else {
-				newProxy = new PathProxy(base, root, keysCopy)
-			}
+
+			var newProxy = new PathProxy({
+				root: root, 
+				keys: keysCopy,
+				base: baseObject
+			})
 
 			return newProxy //return a PathProxy with the new path
 		}
