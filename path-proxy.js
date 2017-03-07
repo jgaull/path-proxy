@@ -86,31 +86,11 @@ function PathProxy(params) {
 
 			//console.log("key: " + key)
 
-			var value
-			//If the toPath() function is the target of the get
-			if (key === "toPath") {
-				//then value is toPath()
-				value = thisBase.toPath
-			}
-			else {
-				//If it's not then use the base objects getValue function
-				value = thisBase.getValue(obj, key)
-			}
+			var value = thisBase.getValue(obj, key)
 
-			if (value) {
-				//If value is a function
-				if (typeof value === 'function') {
-					//Return a function that returns the value of the function (recursion, amirite?)
-					return function () {
-						args = [].slice.call(arguments) //create a copy of the arguments array
-						args.unshift(obj.toPath()) //add the path to this object as the first argument
-						//console.log("args: " + JSON.stringify(args))
-						return value.apply(thisBase, args) //call the function with the base object as the 'this' argument
-					}
-				}
-				else {
-					return value //just return the value if it's not a function
-				}
+			//console.log('key: ' + key + ', value: ' + value)
+			if (value !== undefined) {
+				return value
 			}
 
 			//If there isn't a value then we need to create one

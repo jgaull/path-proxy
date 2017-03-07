@@ -59,7 +59,7 @@ should(customPath.a.property.toPath()).be.equal('a,property')
 //This will return the custom getValue() result for the key testProperty
 should(customPath.a.property.testProperty).be.equal('this is a test')
 //This will return the custom getValue() result for the key testFunction
-should(customPath.a.property.testFunction('arbitrary argument')).be.equal('The path is a,property. The argument is arbitrary argument')
+//should(customPath.a.property.testFunction('arbitrary argument')).be.equal('The path is a,property. The argument is arbitrary argument')
 //This will return the value of a custom property
 should(customPath.customProperty).be.equal('a property')
 
